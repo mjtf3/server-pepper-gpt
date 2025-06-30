@@ -7,17 +7,14 @@ import os
 def mandarArchivo(archivo, ip):
 
     print("Mandando archivo al servidor remoto...")
-    user = 'nao'
-    password = 'nao'
-    puerto = '22'
+    user = 'pepper'
     
     # Comando SCP
     cmd = [
         'scp', 
-        '-P', puerto,  # Puerto SSH
         '-o', 'StrictHostKeyChecking=no',  # Evitar verificación de host
-        '/home/manuel/dev/server-pepper-gpt/prueba-scp.py',
-        '{}@{}:/home/nao/chatbot'.format(user, ip)
+        '/home/nao/test.wav',
+        '{}@{}:/home/pepper/server-pepper-gpt'.format(user, ip)
     ]
     
     try:

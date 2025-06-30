@@ -27,6 +27,7 @@ import argparse
 import threading
 import time
 import sys
+import requests
 #from paramiko import SSHClient
 #from scp import SCPClient
  
@@ -43,10 +44,12 @@ def call_python_script(action, args_dict=None):
             command.append(str(value))
     subprocess.call(command)
 
-def call_AI_model(model, ip):
+def call_AI_model(model, ip, port):
 
     # El endpoint al que queremos llamar
-    url = "http://" + ip + "/procesar_recibir_respuesta"
+    url = "http://" + ip + ":" + port + "/procesar_recibir_respuesta"
+
+    print("Llamando al modelo AI en:", url)
 
     try:
         # Hacemos la petición GET
@@ -57,6 +60,9 @@ def call_AI_model(model, ip):
 
         # Convertimos la respuesta a formato JSON
         data = response.text
+        if isinstance(data, unicode):
+            data = data.encode('utf-8')
+
     
         # Imprimimos los datos obtenidos
         print("Petición exitosa!")
@@ -75,19 +81,18 @@ def call_AI_model(model, ip):
         print("Algo salió mal: {}".format(err))
 
 
+
 def mandarArchivo(archivo, ip):
 
     print("Mandando archivo al servidor remoto...")
     user = 'pepper'
-    puerto = '22'
     
     # Comando SCP
     cmd = [
         'scp', 
-        '-P', puerto,  # Puerto SSH
         '-o', 'StrictHostKeyChecking=no',  # Evitar verificación de host
         '/home/nao/test.wav',
-        '{}@{}:/home/manuel/dev/server-pepper-gpt/test.wav'.format(user, ip)
+        '{}@{}:/home/pepper/server-pepper-gpt'.format(user, ip)
     ]
     
     try:
@@ -175,7 +180,7 @@ def main(args):
 
             print('Ejecutamos funcion para mandar el archivo al servidor')
             mandarArchivo(createdFile, args.serverIP)
-            response = call_AI_model(args.model, args.serverIP)
+            response = call_AI_model(args.model, args.serverIP, args.serverPort)
             print("GPT response: ", response)
 
             if response == '':
@@ -201,6 +206,9 @@ if __name__ == "__main__":
                         help="Model to use for the question answering bot")
     parser.add_argument("--serverIP", type=str, default="192.168.1.221", required=False,
                         help="IP address of the server where the AI model is hosted")
+    parser.add_argument("--serverPort", type=str, default="5000", required=False,
+                        help="Port of the server where the AI model is hosted")
+    
     args = parser.parse_args()
 
     main(args)
