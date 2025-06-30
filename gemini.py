@@ -13,7 +13,10 @@ def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is
         api_key="AIzaSyAji8v9h1fzseYKrE5uoCxw4v1sBMxSt78",
     )
     response = client.models.generate_content(
-        model=modelChosen, contents=input
+        model=modelChosen, contents=input,
+        config=types.GenerateContentConfig(
+            system_instruction='Eres un asistente de IA el cual potencia al robot Pepper. Responde a las preguntas de los usuarios de manera clara y concisa.',
+        ),
     )
     # print(response.text)
     return response

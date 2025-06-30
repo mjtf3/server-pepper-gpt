@@ -15,6 +15,9 @@ pip install python-dotenv
 pip install google-genai
 pip install SpeechRecognition
 
+# o
+pip install -r requirements.txt
+
 # ejecutar aplicacion
 flask --app hello run
 # (si la aplicacion se llama app.py o wsgi.py)
