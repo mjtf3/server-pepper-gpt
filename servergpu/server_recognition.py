@@ -31,7 +31,7 @@ def procesar_archivo(modelo, archivo):
         message_error = "Error al procesar la solicitud de reconocimiento de voz"
         return message_error
 
-    prompt = "Por favor, responde a la siguiente pregunta con una sola opción utilizando menos de " + str(num_of_words) + " palabras pero responde algo de valor: "
+    prompt = "Por favor, responde a la siguiente pregunta con una sola opción: "
     text_question = prompt + " '" + translation + "?' "
     print(text_question)
 

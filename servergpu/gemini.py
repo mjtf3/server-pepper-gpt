@@ -19,7 +19,8 @@ def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is
         model=modelChosen, contents=input,
         config=types.GenerateContentConfig(
             system_instruction='Eres un asistente de IA el cual potencia al robot Pepper. \
-                                Responde a las preguntas de los usuarios de manera clara y concisa.',
+                                Responde a las preguntas de los usuarios de manera clara y concisa. \
+                                En la medida de lo posible, responde en español y que sean alrededor de 10-15 palabras.',
         ),
     )
     # print(response.text)
