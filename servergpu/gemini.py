@@ -1,6 +1,9 @@
 # To run this code you need to install the following dependencies:
 # pip install google-genai
 
+'''
+Codigo que genera contenido utilizando el modelo Gemini de Google.
+'''
 import base64
 import os
 from google import genai
@@ -9,8 +12,8 @@ from google.genai import types
 
 def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is the sky blue?"):
     client = genai.Client(
-        #api_key=os.environ.get("GEMINI_API_KEY"),
-        api_key="AIzaSyAji8v9h1fzseYKrE5uoCxw4v1sBMxSt78",
+        api_key=os.environ.get("GEMINI_API_KEY"),
+        #api_key="<TU_API_KEY_AQUI>",  # Reemplaza con tu API key de Gemini
     )
     response = client.models.generate_content(
         model=modelChosen, contents=input,

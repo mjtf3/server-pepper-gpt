@@ -1,6 +1,10 @@
 import speech_recognition as sr
 from gemini import generate
 
+'''
+Programa que procesa un archivo de audio, lo convierte a texto y llama a un modelo de IA para generar una respuesta.
+'''
+
 def procesar_archivo(modelo, archivo):
 
     num_of_words = 10  # Number of words to limit the response
