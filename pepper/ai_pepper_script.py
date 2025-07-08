@@ -90,7 +90,7 @@ def mandarArchivo(archivo, ip):
         'scp', 
         '-o', 'StrictHostKeyChecking=no',  # Evitar verificación de host
         '/home/nao/test.wav',
-        '{}@{}:/home/pepper/server-pepper-gpt'.format(user, ip)
+        '{}@{}:/home/pepper/server-pepper-gpt/servergpu'.format(user, ip)
     ]
     
     try:
