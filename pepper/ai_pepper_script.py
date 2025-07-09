@@ -28,6 +28,8 @@ import time
 import sys
 import requests
 from pepper_listener import PepperListener
+from script_claude import main as next_question
+
  
 
 def call_python_script(action, args_dict=None):
@@ -190,20 +192,25 @@ def main(pepper_ip, server_ip, server_port, num_of_words, recording_time = 6):
             print([response])
             call_python_script("speak", {"sentence": response, "language": language})
 
-            # Check if the user wants to continue asking questions
-            frase = "¿Quieres hacerme otra pregunta?"
-            call_python_script("speak", {"sentence": frase, "language": language})
-            pepperListener.run(5)  # Wait for Pepper to recognize a word
-            if pepperListener.ultima_palabra is not None:
-                print("Última palabra reconocida:", pepperListener.ultima_palabra)
-                if pepperListener.ultima_palabra.lower() in ["no"]:
-                    asking = False
-                    call_python_script("speak", {"sentence": "De acuerdo, hasta luego!", "language": language})
-                else:
-                    print("Continuando con la siguiente pregunta...")
-            else:
-                print("No se reconoció ninguna palabra, continuando...")
+            answer = None
+            while answer is None:
+                answer = next_question()
 
+            # # Check if the user wants to continue asking questions
+            # frase = "¿Quieres hacerme otra pregunta?"
+            # call_python_script("speak", {"sentence": frase, "language": language})
+            # pepperListener.run(5)  # Wait for Pepper to recognize a word
+            # if pepperListener.ultima_palabra is not None:
+            #     print("Última palabra reconocida:", pepperListener.ultima_palabra)
+            #     if pepperListener.ultima_palabra.lower() in ["no"]:
+            #         asking = False
+            #         call_python_script("speak", {"sentence": "De acuerdo, hasta luego!", "language": language})
+            #     else:
+            #         print("Continuando con la siguiente pregunta...")
+            # else:
+            #     print("No se reconoció ninguna palabra, continuando...")
+
+        call_python_script("speak", {"sentence": "Hasta luego", "language": language})
     except KeyboardInterrupt:
         call_python_script("switch_awareness", {"sentence": "Disable"})
 
@@ -220,11 +227,12 @@ if __name__ == "__main__":
                         help="Model to use for the question answering bot")
     parser.add_argument("--serverIP", type=str, required=True,
                         help="IP address of the server where the AI model is hosted")
-    parser.add_argument("--serverPort", type=str, default="5000", required=False,
+    parser.add_argument("--serverPort", type=str, default="5000", required=True,
                         help="Port of the server where the AI model is hosted")
     
     args = parser.parse_args()
 
+    pepper_ip = args.IP
     recording_time = args.recording_time
     num_of_words = args.num_of_words
     server_ip = args.serverIP

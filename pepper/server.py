@@ -5,7 +5,7 @@ import subprocess
 import os
 import urlparse
 
-SCRIPT_PATH = os.path.abspath("ai_pepper_script.py")  # Ruta a tu script
+SCRIPT_PATH = "/home/nao/pepper-chatbot/ai_pepper_script.py"  # Ruta a tu script
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -18,7 +18,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             try:
                 # Llama al intérprete python2.7 para ejecutar el script
                 output = subprocess.check_output(
-                    ['python', SCRIPT_PATH],
+                    ['python', SCRIPT_PATH, '--serverIP', '172.18.33.110', '--serverPort', '5000'],
                     stderr=subprocess.STDOUT,
                     cwd=os.path.dirname(SCRIPT_PATH)
                 )
