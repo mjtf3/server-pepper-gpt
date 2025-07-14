@@ -195,6 +195,7 @@ def main(pepper_ip, server_ip, server_port, num_of_words, recording_time = 6):
             answer = None
             while answer is None:
                 answer = next_question()
+            asking = answer  # Update asking to the response from next_question
 
             # # Check if the user wants to continue asking questions
             # frase = "¿Quieres hacerme otra pregunta?"
