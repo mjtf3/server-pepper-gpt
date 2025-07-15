@@ -11,6 +11,12 @@ from google.genai import types
 
 
 def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is the sky blue?"):
+
+    # Define the grounding tool
+    grounding_tool = types.Tool(
+        google_search=types.GoogleSearch()
+    )
+
     client = genai.Client(
         api_key=os.environ.get("GEMINI_API_KEY"),
         #api_key="<TU_API_KEY_AQUI>",  # Reemplaza con tu API key de Gemini
@@ -21,6 +27,7 @@ def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is
             system_instruction='Eres un asistente de IA el cual potencia al robot Pepper. \
                                 Responde a las preguntas de los usuarios de manera clara y concisa como si fueras dicho robot Pepper. \
                                 En la medida de lo posible, responde en español y que sean alrededor de 15-20 palabras.',
+            tools=[grounding_tool],
         ),
     )
     # print(response.text)
