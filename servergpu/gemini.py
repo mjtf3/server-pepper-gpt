@@ -17,12 +17,14 @@ def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is
         google_search=types.GoogleSearch()
     )
 
+    audio_file = client.files.upload(file="test.wav")
+
     client = genai.Client(
         api_key=os.environ.get("GEMINI_API_KEY"),
         #api_key="<TU_API_KEY_AQUI>",  # Reemplaza con tu API key de Gemini
     )
     response = client.models.generate_content(
-        model=modelChosen, contents=input,
+        model=modelChosen, contents=[input, audio_file],
         config=types.GenerateContentConfig(
             system_instruction='Eres un asistente de IA el cual potencia al robot Pepper. \
                                 Responde a las preguntas de los usuarios de manera clara y concisa como si fueras dicho robot Pepper. \
