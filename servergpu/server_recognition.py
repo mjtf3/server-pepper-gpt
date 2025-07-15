@@ -32,7 +32,7 @@ def procesar_archivo(modelo, archivo):
         return message_error
 
     prompt = "Por favor, responde a la siguiente pregunta con una sola opción: "
-    text_question = prompt #+ " '" + translation + "?' "
+    text_question = prompt + " '" + translation + "?' "
     print(text_question)
 
     return llamar_modelo_AI(modelo, text_question)
