@@ -25,7 +25,7 @@ def generate(modelChosen ="gemini-2.5-flash-lite-preview-06-17", input = "Why is
     #audio_file = client.files.upload(file="test.wav")
     
     response = client.models.generate_content(
-        model=modelChosen, contents=[input, """audio_file"""],
+        model=modelChosen, contents=input,
         config=types.GenerateContentConfig(
             system_instruction='Eres un asistente de IA el cual potencia al robot Pepper. \
                                 Responde a las preguntas de los usuarios de manera clara y concisa como si fueras dicho robot Pepper. \
