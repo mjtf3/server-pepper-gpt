@@ -20,7 +20,7 @@ def procesar_archivo(modelo, archivo):
         print('Translating...')
         print("I think you asked: ")
         langue_voulue = 'es'
-        translation = recognizer.recognize_google(audio, language=langue_voulue)
+        translation = recognizer.recognize_faster_whisper(audio, language=langue_voulue)
         print(translation)
     except sr.UnknownValueError:
         print("Sorry, I didn't understand you")
