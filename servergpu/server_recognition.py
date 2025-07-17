@@ -8,26 +8,24 @@ Programa que procesa un archivo de audio, lo convierte a texto y llama a un mode
 def procesar_archivo(modelo, archivo):
 
     num_of_words = 10  # Number of words to limit the response
-
+    language_code = 'es-ES'  # Language code for Spanish
+    
+    print('Translating...')
     recognizer = sr.Recognizer()
-
-    recording = sr.AudioFile(archivo)   
-    with recording as source:
-        audio = recognizer.listen(source)
+    with sr.AudioFile(archivo) as source:
+        audio = recognizer.record(source)
     
     
     try:
-        print('Translating...')
         print("I think you asked: ")
-        langue_voulue = 'es'
-        translation = recognizer.recognize_faster_whisper(audio, language=langue_voulue)
+        translation = recognizer.recognize_google(audio, language=language_code)
         print(translation)
     except sr.UnknownValueError:
-        print("Sorry, I didn't understand you")
+        print("Error: No se pudo entender el audio.")
         message_error = "No pude entenderte, lo siento"
         return message_error
     except sr.RequestError as e:
-        print("Could not request results from Google Speech Recognition service; {0}".format(e))
+        print("Error al conectar con el servicio de reconocimiento: {0}".format(e))
         message_error = "Error al procesar la solicitud de reconocimiento de voz"
         return message_error
 
