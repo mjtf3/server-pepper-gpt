@@ -25,8 +25,8 @@ def main():
         # Pausamos el motor de reconocimiento antes de cambiar vocabulario
         asr.pause(True)
 
-        # Definir vocabulario para reconocimiento (como Unicode)
-        vocabulary = ["si", "no", "yes"]
+        # Definir vocabulario más amplio para reconocimiento
+        vocabulary = ["si", "sí", "no", "yes", "yep", "nope", "vale", "okay"]
         asr.setVocabulary(vocabulary, False)
 
         # Reanudo el motor de reconocimiento
@@ -40,12 +40,15 @@ def main():
 
         print("Robot esperando respuesta... Di 'sí' o 'no'")
 
+        # Limpiar datos anteriores de memoria
+        memory.insertData("WordRecognized", [])
+
         # Esperar respuesta del usuario
         recognized = False
         start_time = time.time()
-        timeout = 10  # 10 segundos de timeout
+        timeout = 15  # Aumentado a 15 segundos
 
-        time.sleep(0.5)  # Esperar un segundo antes de empezar a escuchar
+        time.sleep(1.0)  # Esperar un poco más antes de empezar a escuchar
 
         responseType = None
 
@@ -56,16 +59,24 @@ def main():
                 recognized_word = word_recognized[0]
                 confidence = word_recognized[1]
 
-                if confidence > 0.4:  # Umbral de confianza
-                    print("Palabra reconocida: {}".format(recognized_word))
+                print("Palabra detectada: '{}' con confianza: {:.2f}".format(recognized_word, confidence))
+
+                if confidence > 0.5:  # Umbral de confianza más estricto
+                    print("Palabra reconocida con suficiente confianza: {}".format(recognized_word))
                     responseType = process_response(recognized_word, tts)
                     recognized = True
+                    # Limpiar memoria después del reconocimiento
+                    memory.insertData("WordRecognized", [])
                     break
+                else:
+                    print("Confianza insuficiente ({:.2f}), continuando...".format(confidence))
+                    # Limpiar para evitar re-procesamiento
+                    memory.insertData("WordRecognized", [])
 
             time.sleep(0.1)
 
         if not recognized:
-            tts.say("No pude escuchar tu respuesta. Intenta de nuevo.")
+            tts.say("No pude escuchar tu respuesta claramente. Intenta hablar más claro.")
 
         # Detener reconocimiento
         asr.unsubscribe("Test_ASR")
@@ -91,14 +102,14 @@ def process_response(word, tts):
     """
     word_lower = word.lower()
 
-    if word_lower in [u"si", u"yes"]:
+    if word_lower in [u"si", u"sí", u"yes", u"yep", u"vale", u"okay"]:
         # Reacción positiva
         # tts.say("¡Excelente! Me alegra saber que te gusta programar.")
         # tts.say("La programación es muy divertida y útil.")
         print("Usuario respondió SÍ - Reacción positiva")
         return True
 
-    elif word_lower in [u"no"]:
+    elif word_lower in [u"no", u"nope"]:
         # Reacción negativa
         tts.say("Entiendo. Ha sido un placer.")
         tts.say("No dudes en volver a consultarme.")
@@ -108,7 +119,7 @@ def process_response(word, tts):
     else:
         # Respuesta no reconocida
         tts.say("No estoy seguro de tu respuesta. Puedes decir sí o no.")
-        print("Respuesta no reconocida")
+        print("Respuesta no reconocida: '{}'".format(word_lower))
         return None
 
 
