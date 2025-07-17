@@ -27,7 +27,6 @@ import threading
 import time
 import sys
 import requests
-from pepper_listener import PepperListener
 from script_claude import main as next_question
 
  
@@ -118,23 +117,22 @@ def main(pepper_ip, server_ip, server_port, num_of_words, recording_time = 6):
     # recognizer = sr.Recognizer()
     os.system('clear')
 
-    pepperListener = PepperListener(pepper_ip)  # Initialize Pepper listener
+    # pepperListener = PepperListener(pepper_ip)  # Initialize Pepper listener
     
     use_pepper = True
     serverPort = server_port
     serverIP = server_ip
     asking = True
 
-    sentence = "Toca mi cabeza para hacerme una pregunta"
-    text_robot = sentence
-    print(sentence)     
     language = 'Spanish' #Spanish, 'en': English
-    call_python_script("speak", {"sentence": text_robot, "language": language})
     
     waiting_messages = [["Estoy pensando"], ["Un momento"],["espere un momento"]]
     
     try:
         while asking:
+            sentence = "Toca mi cabeza para hacerme una pregunta"
+            print(sentence)     
+            call_python_script("speak", {"sentence": sentence, "language": language})
             # Wait for pepper to sense touch
             call_python_script("wait_touch", {"language": language})
             # Open microphone and wait for the question            

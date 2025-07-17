@@ -8,6 +8,10 @@ Requiere Python 2.7 y NAOqi SDK
 from naoqi import ALProxy
 import time
 
+# Clave de ALMemory para marcar vocab inicializado
+VOCAB_FLAG = "MyApp/VocabInitialized"
+
+
 def main():
     # Configuración del robot
     ROBOT_IP = "localhost"  # Cambia por la IP de tu robot
@@ -22,18 +26,38 @@ def main():
         # Configurar el reconocimiento de voz
         asr.setLanguage("Spanish")  # o "English" según prefieras
 
-        # Pausamos el motor de reconocimiento antes de cambiar vocabulario
-        asr.pause(True)
+        try:
+            asr.unsubscribe("MiApp_ASR")
+        except RuntimeError:
+            pass
 
-        # Definir vocabulario para reconocimiento (como Unicode)
-        vocabulary = ["si", "no", "yes"]
-        asr.setVocabulary(vocabulary, False)
+        # SOLO la primera vez: definir y cargar el vocabulario
+        try:
+            already = memory.getData(VOCAB_FLAG)
+        except Exception:
+            already = False
 
-        # Reanudo el motor de reconocimiento
-        asr.pause(False)
+        if not already:
+            # Pausar ASR para cambiar vocabulario
+            asr.pause(True)
+
+            # Definir vocabulario
+            vocabulary = ["si", "no", "yes"]
+            asr.setVocabulary(vocabulary, False)
+
+            # Reanudar ASR
+            asr.pause(False)
+
+            # Marcar en ALMemory que ya lo inicializamos
+            memory.insertData(VOCAB_FLAG, True)
+
+
 
         # Hacer una pregunta al usuario
         tts.say("¿Tienes alguna otra pregunta?")
+
+        # limpiamos memorio
+        memory.insertData("WordRecognized", ["", 0.0])
 
         # Iniciar reconocimiento de voz
         asr.subscribe("Test_ASR")
@@ -56,7 +80,7 @@ def main():
                 recognized_word = word_recognized[0]
                 confidence = word_recognized[1]
 
-                if confidence > 0.4:  # Umbral de confianza
+                if confidence > 0.5:  # Umbral de confianza
                     print("Palabra reconocida: {}".format(recognized_word))
                     responseType = process_response(recognized_word, tts)
                     recognized = True
@@ -81,7 +105,10 @@ def main():
 
         # Detener el reconocimiento
         if 'asr' in locals():
-            asr.unsubscribe("Test_ASR")
+            try:
+                asr.unsubscribe("Test_ASR")
+            except RuntimeError:
+                pass
         return None
 
 

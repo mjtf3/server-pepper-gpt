@@ -14,6 +14,11 @@ class PepperListener(object):
         
         # Generar un identificador único para esta instancia
         self.subscriber_id = "PepperListener_" + str(uuid.uuid4())[:8]
+
+        try:
+            self.asr.unsubscribe("MiApp_ASR")
+        except RuntimeError:
+            pass
         
         # Pausamos el motor de reconocimiento antes de cambiar vocabulario
         self.asr.pause(True)
