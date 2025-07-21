@@ -1,7 +1,3 @@
 Flask
 google-genai
 SpeechRecognition
-soundfile
-faster-whisper
-vosk
-ffmpeg
