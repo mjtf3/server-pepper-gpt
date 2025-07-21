@@ -5,7 +5,7 @@ from gemini import generate
 Programa que procesa un archivo de audio, lo convierte a texto y llama a un modelo de IA para generar una respuesta.
 '''
 
-def procesar_archivo(modelo, archivo):
+def procesar_archivo(modelo, archivo, provider, personalidad):
 
     num_of_words = 10  # Number of words to limit the response
     language_code = 'es-ES'  # Language code for Spanish
@@ -33,11 +33,11 @@ def procesar_archivo(modelo, archivo):
     text_question = prompt + " '" + translation + "?' "
     print(text_question)
 
-    return llamar_modelo_AI(modelo, text_question)
+    return llamar_modelo_AI(modelo, text_question, provider, personalidad)
 
 
 
-def llamar_modelo_AI(modelo, pregunta):
+def llamar_modelo_AI(modelo, pregunta, provider, personalidad):
     # response = call_AI_model(modelo, pregunta) #hacer llamada al modelo AI, creo que se deberia de hacer aqui de hecho
     response = generate(modelChosen=modelo, input=pregunta)
 
@@ -53,3 +53,14 @@ def llamar_modelo_AI(modelo, pregunta):
 
     print(result)
     return result
+
+def gemini_generate(model, prompt, personalidad):
+    """
+    Función para generar una respuesta utilizando el modelo Gemini.
+    """
+    try:
+        response = generate(modelChosen=model, input=prompt)
+        return response
+    except Exception as e:
+        print(f"Error al generar la respuesta con Gemini: {e}")
+        return "Error al procesar la solicitud de IA"
