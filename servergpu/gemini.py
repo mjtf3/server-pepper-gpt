@@ -3,6 +3,8 @@
 
 '''
 Codigo que genera contenido utilizando el modelo Gemini de Google.
+
+DEPRECATED: Se usa el provider gemini_provider.py
 '''
 import base64
 import os
