@@ -27,7 +27,7 @@ import threading
 import time
 import sys
 import requests
-from script_claude import main as next_question
+from choice_script import ask_pepper_question
 
  
 
@@ -43,7 +43,7 @@ def call_python_script(action, args_dict=None):
             command.append(str(value))
     subprocess.call(command)
 
-def call_AI_model(model, ip, port):
+def call_AI_model(provider, ip, port, personalidad=4):
 
     # El endpoint al que queremos llamar
     url = "http://" + ip + ":" + port + "/procesar_recibir_respuesta"
@@ -51,8 +51,14 @@ def call_AI_model(model, ip, port):
     print("Llamando al modelo AI en:", url)
 
     try:
+        # Preparamos los parámetros de la petición
+        payload = {
+            "provider": provider,  # Puede ser 'gemini', 'openai'...
+            "personalidad": personalidad,  # Puedes ajustar esto según tus necesidades
+        }
+
         # Hacemos la petición GET
-        response = requests.get(url)
+        response = requests.get(url, params=payload)
 
         # Verificamos si la petición fue exitosa (código de estado 200)
         response.raise_for_status()  # Lanza una excepción para errores HTTP (4xx o 5xx)
@@ -90,7 +96,7 @@ def mandarArchivo(archivo, ip):
     cmd = [
         'scp', 
         '-o', 'StrictHostKeyChecking=no',  # Evitar verificación de host
-        '/home/nao/test.wav',
+        archivo,
         '{}@{}:/home/pepper/server-pepper-gpt/servergpu'.format(user, ip)
     ]
     
@@ -112,21 +118,31 @@ def countdown(seconds):
         time.sleep(1)
     print("\n⏹️ Time's up!")
 
+def preguntar_personalidad():
+    
+    pregunta = "¿Qué personalidad quieres que tenga? Puedo ser: cuidador de mayores, cuidador de niños, profesor o pepper"
+    respuestas = {
+        "mayores": {"text": "Has elegido ser cuidador de mayores", "value": 1},
+        "niños": {"text": "Has elegido ser cuidador de niños", "value": 2},
+        "profesor": {"text": "Has elegido ser profesor", "value": 3},
+        "pepper": {"text": "Has elegido ser pepper", "value": 4}
+    }
+    return ask_pepper_question(pregunta, respuestas)
 
-def main(pepper_ip, server_ip, server_port, num_of_words, recording_time = 6):
-    # recognizer = sr.Recognizer()
+
+def main(pepper_ip, server_ip, server_port, recording_time, provider):
     os.system('clear')
-
-    # pepperListener = PepperListener(pepper_ip)  # Initialize Pepper listener
     
     use_pepper = True
-    serverPort = server_port
-    serverIP = server_ip
     asking = True
-
     language = 'Spanish' #Spanish, 'en': English
+
+    personalidad, valor_personalidad = preguntar_personalidad()
+
+    call_python_script("speak", {"sentence": personalidad, "language": language})
+
     
-    waiting_messages = [["Estoy pensando"], ["Un momento"],["espere un momento"]]
+    waiting_messages = [["Estoy pensando"], ["Un momento"],["Espere un momento"]]
     
     try:
         while asking:
@@ -141,75 +157,38 @@ def main(pepper_ip, server_ip, server_port, num_of_words, recording_time = 6):
                 call_python_script("listen", {"listen_time": recording_time})
                 print("Pepper has stopped listening.")
                 call_python_script("speak", {"sentence": random.choice(waiting_messages)[0], "language": language})
-                # Aqui en vez de copiar el archivo, lo procesamos directamente en el robot
                 createdFile = '/home/nao/test.wav'
 
                 call_python_script("speak", {"sentence": "ya he terminado de escuchar", "language": language})
-                #recording = sr.AudioFile(createdFile)   
-                #with recording as source:
-                #    audio = recognizer.listen(source)
+
             else:
                 pass
-                #with sr.Microphone() as source:
-                #    print("🎙️ Listening... You have %d seconds to speak" % recording_time)
-                #    
-                #    # Start countdown in background
-                #    countdown_thread = threading.Thread(target=countdown, args=(recording_time,))
-                #    countdown_thread.start()
-                #    
-                #    start_time = time.time()
-                #    # Start listening (in background) and show countdown simultaneously
-                #    audio = recognizer.listen(source, phrase_time_limit=recording_time)    
-                #    elapsed_time = time.time() - start_time                             
-                #    print("⏹️ Stop listening. Recording time was: {:.2f} seconds".format(elapsed_time))
-                #call_python_script("speak", {"sentence": random.choice(waiting_messages)[0], "language": language})        
 
-            # try:
-            #     print('Translating...')
-            #     print("I think you asked: ")
-            #     langue_voulue = 'es'
-            #     translation = recognizer.recognize_google(audio, language=langue_voulue)
-            #     print(translation)
-            # except sr.UnknownValueError:
-            #     print("Sorry, I didn't understand you")
-            #     message_error = "No pude entenderte, lo siento"
-            #     call_python_script("speak", {"sentence": message_error, "language": language})
-            #     continue 
-            # except sr.RequestError as e:
-            #     print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
-            print('Ejecutamos funcion para mandar el archivo al servidor')
-            mandarArchivo(createdFile, serverIP)
-            response = call_AI_model('args.model', serverIP, serverPort)
-            print("GPT response: ", response)
+            print('Mandamos archivo al servidor remoto.')
+            mandarArchivo(createdFile, server_ip)
+            print('Llamamos al modelo AI.')
+            response = call_AI_model(provider, server_ip, server_port, personalidad=valor_personalidad)
+            print("Respuesta del modelo AI: ", response)
 
             if response == '':
                 print("Respuesta vacía")
                 response = "Puedes repetir la pregunta"
 
-            print([response])
             call_python_script("speak", {"sentence": response, "language": language})
 
-            answer = None
-            while answer is None:
-                answer = next_question()
-            asking = answer  # Update asking to the response from next_question
+            pregunta = "¿Tienes alguna otra pregunta?"
+            respuestas = {
+                "si": {"text": "¡Vamos!", "value": 1},
+                "no": {"text": "Entiendo. Ha sido un placer. No dudes en volver a consultarme.", "value": 0}
+            }
 
-            # # Check if the user wants to continue asking questions
-            # frase = "¿Quieres hacerme otra pregunta?"
-            # call_python_script("speak", {"sentence": frase, "language": language})
-            # pepperListener.run(5)  # Wait for Pepper to recognize a word
-            # if pepperListener.ultima_palabra is not None:
-            #     print("Última palabra reconocida:", pepperListener.ultima_palabra)
-            #     if pepperListener.ultima_palabra.lower() in ["no"]:
-            #         asking = False
-            #         call_python_script("speak", {"sentence": "De acuerdo, hasta luego!", "language": language})
-            #     else:
-            #         print("Continuando con la siguiente pregunta...")
-            # else:
-            #     print("No se reconoció ninguna palabra, continuando...")
+            value = None
+            while value is None:
+                answer, value = ask_pepper_question(pregunta, respuestas)
+            asking = value 
 
-        call_python_script("speak", {"sentence": "Hasta luego", "language": language})
+        call_python_script("speak", {"sentence": answer, "language": language})
     except KeyboardInterrupt:
         call_python_script("switch_awareness", {"sentence": "Disable"})
 
@@ -224,6 +203,8 @@ if __name__ == "__main__":
     parser.add_argument("--num_of_words", type=int, default=30, required=False)
     parser.add_argument("--model", type=str, default="gpt-3.5-turbo", required=False,
                         help="Model to use for the question answering bot")
+    parser.add_argument("--provider", type=str, default="gemini", required=False,
+                        help="Provider to use for the question answering bot")
     parser.add_argument("--serverIP", type=str, required=True,
                         help="IP address of the server where the AI model is hosted")
     parser.add_argument("--serverPort", type=str, default="5000", required=True,
@@ -236,5 +217,6 @@ if __name__ == "__main__":
     num_of_words = args.num_of_words
     server_ip = args.serverIP
     server_port = args.serverPort
+    provider = args.provider
 
-    main(pepper_ip,server_ip, server_port, num_of_words, recording_time)
+    main(pepper_ip,server_ip, server_port, recording_time, provider)

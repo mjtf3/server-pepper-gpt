@@ -5,6 +5,12 @@ import subprocess
 import os
 import urlparse
 
+"""
+Servidor HTTP simple para ejecutar un script de Python en el robot Pepper haciendo una petición GET a un endpoint específico.
+
+La ruta a este archivo debe introducirse en el archivo '/home/nao/naoqi/preferences/autoload.ini' para que se ejecute automáticamente al iniciar el robot Pepper.
+"""
+
 SCRIPT_PATH = "/home/nao/pepper-chatbot/ai_pepper_script.py"  # Ruta a tu script
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -56,5 +62,5 @@ class RequestHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     port = 8080
     httpd = HTTPServer(('0.0.0.0', port), RequestHandler)
-    print "Servidor escuchando en http://0.0.0.0:{}".format(port)
+    print("Servidor escuchando en http://0.0.0.0:{}".format(port))
     httpd.serve_forever()
