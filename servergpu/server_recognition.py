@@ -6,8 +6,6 @@ from personality_manager import PersonalityManager
 Programa que procesa un archivo de audio, lo convierte a texto y llama a un modelo de IA para generar una respuesta.
 '''
 
-# Initialize personality manager
-personality_manager = PersonalityManager()
 
 def procesar_archivo(archivo, provider, personalidad):
     """
@@ -23,19 +21,19 @@ def procesar_archivo(archivo, provider, personalidad):
     """
     language_code = 'es-ES'  # Language code for Spanish
     
-    # Validate inputs
+    # Validar los inputs
     if not provider:
         return "Error: Provider no especificado"
     
     if not personalidad:
-        personalidad = "1"  # Default personality
+        personalidad = "4"  # Default personality
     
-    # Transcribe audio to text
+    # Transcribir audio a texto
     transcription = transcribir_audio(archivo, language_code)
     if transcription.startswith("Error:") or transcription.startswith("No pude"):
         return transcription
     
-    # Generate AI response
+    # Generar la respuesta de la IA
     return generar_respuesta_ai(transcription, provider, personalidad)
 
 def transcribir_audio(archivo, language_code='es-ES'):
@@ -84,11 +82,14 @@ def generar_respuesta_ai(pregunta, provider_name, personalidad_id):
         str: Respuesta generada por la IA
     """
     try:
-        # Get the appropriate provider
+        # Obtener el provider
         provider = get_provider(provider_name)
         print(f"Usando provider: {provider.name}")
+
+        # Inicializar el manager de personalidades
+        personality_manager = PersonalityManager()
         
-        # Get system prompt for the personality
+        # Obtener la personalidad
         personality = personality_manager.get_personality(personalidad_id)
         if not personality:
             return "Error: Personalidad no encontrada"
@@ -97,12 +98,12 @@ def generar_respuesta_ai(pregunta, provider_name, personalidad_id):
         personality_name = personality.get('name', '')
         print(f"Usando personalidad: {personality_name}")
         
-        # Prepare the prompt
+        # Preparar el prompt
         prompt_prefix = "Por favor, responde a la siguiente pregunta usando menos de 40 palabras: "
         full_prompt = f"{prompt_prefix}'{pregunta}'"
         print(f"Prompt: {full_prompt}")
         
-        # Generate response using the provider
+        # Generar la respuesta usando el provider
         response = provider.generate_response(
             prompt=full_prompt,
             system_prompt=system_prompt,

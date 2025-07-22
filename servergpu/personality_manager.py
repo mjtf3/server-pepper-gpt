@@ -4,7 +4,7 @@ from typing import Dict, Optional
 
 class PersonalityManager:
     """
-    Manager class for handling AI personality configurations.
+    Clase para manejar las personalidades de la IA
     """
     
     def __init__(self, personalities_file: str = "personalities.json"):
@@ -14,65 +14,36 @@ class PersonalityManager:
     
     def _load_personalities(self):
         """
-        Load personalities from JSON file.
+        Carga las personalidades desde el archivo JSON.
         """
-        try:
-            if os.path.exists(self.personalities_file):
-                with open(self.personalities_file, 'r', encoding='utf-8') as file:
-                    self._personalities = json.load(file)
-            else:
-                # Create default personalities if file doesn't exist
-                self._personalities = self._get_default_personalities()
-                self._save_personalities()
-        except Exception as e:
-            print(f"Error loading personalities: {e}")
-            self._personalities = self._get_default_personalities()
-    
-    def _save_personalities(self):
-        """
-        Save personalities to JSON file.
-        """
-        try:
-            with open(self.personalities_file, 'w', encoding='utf-8') as file:
-                json.dump(self._personalities, file, indent=4, ensure_ascii=False)
-        except Exception as e:
-            print(f"Error saving personalities: {e}")
-    
-    def _get_default_personalities(self) -> Dict:
-        """
-        Get default personality configurations.
-        
-        Returns:
-            Dict: Default personalities
-        """
-        return {
-            "1": {
-                "name": "Pepper Amigable",
-                "system_prompt": "Eres un asistente de IA el cual potencia al robot Pepper. Responde a las preguntas de los usuarios de manera clara y concisa como si fueras dicho robot Pepper. En la medida de lo posible, responde en español y que sean alrededor de 15-20 palabras."
-            }
-        }
+        if os.path.exists(self.personalities_file):
+            with open(self.personalities_file, 'r', encoding='utf-8') as file:
+                self._personalities = json.load(file)
+        else:
+            # Error al cargar las personalidades
+            raise FileNotFoundError(f"El archivo de personalidades {self.personalities_file} no existe")
     
     def get_personality(self, personality_id: str) -> Optional[Dict]:
         """
-        Get personality configuration by ID.
+        Obtiene la configuración de la personalidad por ID.
         
         Args:
-            personality_id (str): ID of the personality
+            personality_id (str): ID de la personalidad
             
         Returns:
-            Optional[Dict]: Personality configuration (name, system_prompt) or (None, None) if not found
+            Optional[Dict]: Configuración de la personalidad (name, system_prompt) o (None, None) si no se encuentra
         """
-        return self._personalities.get(str(personality_id))
+        return self._personalities.get(str(personality_id), (None,None))
     
     def get_available_personalities(self) -> Dict:
         """
-        Get all available personalities.
+        Obtiene todas las personalidades disponibles.
         
         Returns:
-            Dict: All personality configurations
+            Dict: Todas las personalidades con el formato {id: {name: str, system_prompt: str}}
         """
         return self._personalities.copy()
 
 if __name__ == "__main__":
     pm = PersonalityManager()
-    print(pm.get_personality(2))
+    print(pm.get_personality(10))
