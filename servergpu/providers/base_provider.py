@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+import logging
 
 class BaseProvider(ABC):
     """
@@ -9,6 +9,10 @@ class BaseProvider(ABC):
     
     def __init__(self):
         self.name = self.__class__.__name__
+        logging.basicConfig(filename='errores.log', level=logging.ERROR)
+    
+    def log_error(self, error: str):
+        logging.error(error)
     
     @abstractmethod
     def generate_response(self, prompt: str, system_prompt: str = "", **kwargs) -> str:

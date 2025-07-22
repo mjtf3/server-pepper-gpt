@@ -2,6 +2,9 @@ import os
 from google import genai
 from google.genai import types
 from .base_provider import BaseProvider
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class GeminiProvider(BaseProvider):
     """
@@ -43,7 +46,11 @@ class GeminiProvider(BaseProvider):
             
             # Build configuration
             config = types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=0
+                ),
                 tools=[grounding_tool],
+                response_mime_type="text/plain",
             )
             
             # Add system instruction if provided
@@ -63,4 +70,5 @@ class GeminiProvider(BaseProvider):
             
         except Exception as e:
             print(f"Error al generar respuesta con Gemini: {e}")
-            return "Error al procesar la solicitud de IA"
+            self.log_error(str(e))
+            return "Error al procesar la solicitud de IA, revisa el log de errores"

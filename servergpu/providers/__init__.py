@@ -1,9 +1,11 @@
 from .base_provider import BaseProvider
 from .gemini_provider import GeminiProvider
+from .openai_provider import OpenAIProvider
 
 # Registry of available providers
 AVAILABLE_PROVIDERS = {
     'gemini': GeminiProvider,
+    'openai': OpenAIProvider,
 }
 
 def get_provider(provider_name: str) -> BaseProvider:
