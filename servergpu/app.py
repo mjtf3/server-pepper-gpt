@@ -8,18 +8,10 @@ REQUISITOS:
 - Tener los providers configurados (gemini.py, etc.)
 - Tener las API keys configuradas en el entorno
 - Tener el archivo de audio test.wav en la misma carpeta que este script
-
-NUEVAS FUNCIONALIDADES:
-- Soporte para múltiples providers (gemini, openai, etc.)
-- Personalidades configurables
-- Validación de parámetros
-- Endpoints informativos
 '''
 
 from flask import Flask, request, jsonify
-from server_recognition import (
-    procesar_archivo as procesar_archivo_local,
-)
+from server_recognition import procesar_archivo
 from providers import get_available_providers
 from personality_manager import PersonalityManager
 
@@ -33,7 +25,6 @@ def llamada():
     Parámetros:
         provider (str): Nombre del provider ('gemini', 'openai', etc.)
         personalidad (str): ID de la personalidad (1, 2, 3, etc.)
-        modelo (str, opcional): Modelo específico a usar
         archivo (str, opcional): Nombre del archivo de audio (default: test.wav)
     
     Returns:
@@ -49,10 +40,10 @@ def llamada():
         return "Error: Parámetro 'provider' es requerido. Providers disponibles: " + ", ".join(get_available_providers()), 400
     
     if not personalidad:
-        personalidad = "1"  # Default personality
+        personalidad = "4"  # Default personality
     
     try:
-        respuesta = procesar_archivo_local(archivo, provider, personalidad)
+        respuesta = procesar_archivo(archivo, provider, personalidad)
         return respuesta
     except Exception as e:
         return f"Error interno del servidor: {str(e)}", 500
@@ -91,6 +82,13 @@ def get_info():
             
             <h2>PERSONALIDADES DISPONIBLES</h2>
             <pre>{}</pre>
+            
+            <h2>PARÁMETROS</h2>
+            <ul>
+                <li><strong>provider</strong> (requerido): Nombre del provider (<code>gemini</code>, <code>openai</code>)</li>
+                <li><strong>personalidad</strong> (opcional): ID de personalidad (1-4, default: 4)</li>
+                <li><strong>archivo</strong> (opcional): Archivo de audio (default: test.wav)</li>
+            </ul>
             
             <h2>ENDPOINTS DISPONIBLES</h2>
             <ul>

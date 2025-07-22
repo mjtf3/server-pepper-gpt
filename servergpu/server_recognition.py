@@ -4,7 +4,6 @@ from personality_manager import PersonalityManager
 
 '''
 Programa que procesa un archivo de audio, lo convierte a texto y llama a un modelo de IA para generar una respuesta.
-Refactorizado para usar múltiples providers y personalidades configurables.
 '''
 
 # Initialize personality manager
@@ -99,7 +98,7 @@ def generar_respuesta_ai(pregunta, provider_name, personalidad_id):
         print(f"Usando personalidad: {personality_name}")
         
         # Prepare the prompt
-        prompt_prefix = "Por favor, responde a la siguiente pregunta: "
+        prompt_prefix = "Por favor, responde a la siguiente pregunta usando menos de 40 palabras: "
         full_prompt = f"{prompt_prefix}'{pregunta}'"
         print(f"Prompt: {full_prompt}")
         

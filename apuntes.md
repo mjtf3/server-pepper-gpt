@@ -45,11 +45,12 @@ me he quedado intentando ejecutar flask en el pepper
 
 
 # 18/05
-- [] que se puedan cambiar de modelos de ia
-- [] hacer documentacion para todo
-- [] realizar distintos prompts del sistema para la ia y que al iniciar se puedan elegir que personalidad se quiere
+- [x] que se puedan cambiar de providers de ia
+- [] haer documentacion para todoc
+- [x] realizar distintos prompts del sistema para la ia y que al iniciar se puedan elegir que personalidad se quiere
     - personalidades:
         - neutro
         - cuidador para ancionos
         - cuidador para niños
         - profesor para estudiantes de secundaria
+- [] arregla el tema de los argumentos en ai_pepper_script.py
