@@ -23,7 +23,6 @@ import subprocess
 import os 
 import random 
 import argparse 
-import threading
 import time
 import sys
 import requests

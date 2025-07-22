@@ -7,6 +7,7 @@ import urlparse
 
 """
 Servidor HTTP simple para ejecutar un script de Python en el robot Pepper haciendo una petición GET a un endpoint específico.
+Este servidor se usa para poder ejecutar el script de python que se encarga de la interaccion con el servidor de IA desde la pagina web.
 
 La ruta a este archivo debe introducirse en el archivo '/home/nao/naoqi/preferences/autoload.ini' para que se ejecute automáticamente al iniciar el robot Pepper.
 """
