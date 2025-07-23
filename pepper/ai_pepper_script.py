@@ -129,12 +129,24 @@ def preguntar_personalidad():
     return ask_pepper_question(pregunta, respuestas)
 
 
-def main(pepper_ip, server_ip, server_port, recording_time, provider):
+def main(server_ip, server_port, recording_time, provider):
     os.system('clear')
     
-    use_pepper = True
     asking = True
-    language = 'Spanish' #Spanish, 'en': English
+    language = 'Spanish'
+
+    if provider == 'none':
+        pregunta = "¿Qué proveedor de IA quieres usar? Di 'uno' para Gemini y 'dos' para OpenAI"
+        respuestas = {
+            "uno": {"text": "Gemini", "value": "gemini"},
+            "dos": {"text": "OpenAI", "value": "openai"},
+        }
+        _, provider_value = ask_pepper_question(pregunta, respuestas)
+        if provider_value == None:  
+            print("No se ha seleccionado ningún proveedor de IA")
+            return
+        else:
+            provider = provider_value
 
     personalidad, valor_personalidad = preguntar_personalidad()
 
@@ -151,17 +163,13 @@ def main(pepper_ip, server_ip, server_port, recording_time, provider):
             # Wait for pepper to sense touch
             call_python_script("wait_touch", {"language": language})
             # Open microphone and wait for the question            
-            if use_pepper:
-                print('Pepper is listening to you!')        
-                call_python_script("listen", {"listen_time": recording_time})
-                print("Pepper has stopped listening.")
-                call_python_script("speak", {"sentence": random.choice(waiting_messages)[0], "language": language})
-                createdFile = '/home/nao/test.wav'
+            print('Pepper is listening to you!')        
+            call_python_script("listen", {"listen_time": recording_time})
+            print("Pepper has stopped listening.")
+            call_python_script("speak", {"sentence": random.choice(waiting_messages)[0], "language": language})
+            createdFile = '/home/nao/test.wav'
 
-                call_python_script("speak", {"sentence": "ya he terminado de escuchar", "language": language})
-
-            else:
-                pass
+            call_python_script("speak", {"sentence": "ya he terminado de escuchar", "language": language})
 
 
             print('Mandamos archivo al servidor remoto.')
@@ -185,37 +193,27 @@ def main(pepper_ip, server_ip, server_port, recording_time, provider):
             value = None
             while value is None:
                 answer, value = ask_pepper_question(pregunta, respuestas)
+                time.sleep(0.5)
             asking = value 
 
         call_python_script("speak", {"sentence": answer, "language": language})
     except KeyboardInterrupt:
         call_python_script("switch_awareness", {"sentence": "Disable"})
 
-if __name__ == "__main__":  
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--use_pepper_mic", dest="usePepper", type=bool, default=True, required=False)
-    parser.add_argument("--IP", type=str, default="127.0.0.1",
-                        help="IP address of the Pepper robot. Por defecto usamos localhost")
-    parser.add_argument("--port", type=int, default=9559, required=False)
-    parser.add_argument("--recording_time", type=int, default=6, required=False,
-                        help="Time in seconds to record the question")
-    parser.add_argument("--num_of_words", type=int, default=30, required=False)
-    parser.add_argument("--model", type=str, default="gpt-3.5-turbo", required=False,
-                        help="Model to use for the question answering bot")
-    parser.add_argument("--provider", type=str, default="gemini", required=False,
-                        help="Provider to use for the question answering bot")
-    parser.add_argument("--serverIP", type=str, required=True,
-                        help="IP address of the server where the AI model is hosted")
-    parser.add_argument("--serverPort", type=str, default="5000", required=True,
-                        help="Port of the server where the AI model is hosted")
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Script de control para la interacción con Pepper AI")
+
+    parser.add_argument("--use_pepper_mic", dest="usePepper", type=bool, default=True, required=False, help="Usar el micrófono de Pepper (por defecto: True)")
+    parser.add_argument("--IP", type=str, default="127.0.0.1", required=False, help="Dirección IP del robot Pepper (por defecto: localhost)")
+    parser.add_argument("--port", type=int, default=9559, required=False, help="Puerto para el robot Pepper (por defecto: 9559)")
+    parser.add_argument("--recording_time", type=int, default=6, required=False, help="Tiempo en segundos para grabar la pregunta (por defecto: 6)")
+    parser.add_argument("--num_of_words", type=int, default=30, required=False, help="Número máximo de palabras a procesar (por defecto: 30)")
+    parser.add_argument("--model", type=str, default="gpt-3.5-turbo", required=False, help="Modelo a utilizar para el bot de preguntas y respuestas (por defecto: gpt-3.5-turbo)")
+    parser.add_argument("--provider", type=str, default="none", required=False, help="Proveedor a utilizar para el bot de preguntas y respuestas (por defecto: gemini)")
+    parser.add_argument("--serverIP", type=str, required=True, help="Dirección IP del servidor donde está alojado el modelo de IA")
+    parser.add_argument("--serverPort", type=str, default="5000", required=True, help="Puerto del servidor donde está alojado el modelo de IA (por defecto: 5000)")
     
     args = parser.parse_args()
 
-    pepper_ip = args.IP
-    recording_time = args.recording_time
-    num_of_words = args.num_of_words
-    server_ip = args.serverIP
-    server_port = args.serverPort
-    provider = args.provider
-
-    main(pepper_ip,server_ip, server_port, recording_time, provider)
+    main(args.serverIP, args.serverPort, args.recording_time, args.provider)

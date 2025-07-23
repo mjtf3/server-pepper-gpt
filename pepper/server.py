@@ -23,17 +23,36 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
+    # Manejo de las peticiones GET
+    # El endpoint es http://localhost:8080/run-script al que, como parametro opcional, se le puede pasar el provider de la IA 
+    # por ejemplo: http://localhost:8080/run-script?provider=gemini
     def do_GET(self):
         # Parseamos la URL para separar path y query string
         parsed = urlparse.urlparse(self.path)
         path = parsed.path
+        query = parsed.query
+        params = urlparse.parse_qs(query)
+        print("Path:", path)
+        print("Query string:", query)
+        if 'provider' in params:
+            print("Params (provider):", params['provider'])
+        else:
+            print("Params: 'provider' no especificado")
 
         if path == '/run-script':
             # Ejecutamos el script externo y capturamos su salida
             try:
+                command = ['python', SCRIPT_PATH, '--serverIP', '172.18.33.110', '--serverPort', '5000']
+
+                if 'provider' in params:
+                    command.append('--provider')
+                    command.append(params['provider'][0])
+
+                print(command)
+
                 # Llama al intérprete python2.7 para ejecutar el script
                 output = subprocess.check_output(
-                    ['python', SCRIPT_PATH, '--serverIP', '172.18.33.110', '--serverPort', '5000'],
+                    command,
                     stderr=subprocess.STDOUT,
                     cwd=os.path.dirname(SCRIPT_PATH)
                 )
@@ -63,5 +82,5 @@ class RequestHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     port = 8080
     httpd = HTTPServer(('0.0.0.0', port), RequestHandler)
-    print("Servidor escuchando en http://0.0.0.0:{}".format(port))
+    print("Servidor escuchando en http://localhost:{}".format(port))
     httpd.serve_forever()

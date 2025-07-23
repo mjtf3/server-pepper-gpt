@@ -10,6 +10,7 @@ import time
 
 # Clave de ALMemory para marcar vocab inicializado
 VOCAB_FLAG = "MyApp/VocabInitialized"
+DISTINCT_VOCABS = []
 
 class PepperInteractionHandler:
     def __init__(self, robot_ip="localhost", robot_port=9559):
@@ -93,6 +94,7 @@ class PepperInteractionHandler:
                 
         except Exception as e:
             print("Error durante la interacción: {}".format(e))
+            print(e)
             return (None, None)
         finally:
             # Asegurar que se detenga el reconocimiento
@@ -128,6 +130,7 @@ class PepperInteractionHandler:
             
         except Exception as e:
             print("Error configurando vocabulario")
+            print(e)
             raise e
 
     def _wait_for_response(self, timeout, confidence_threshold):
@@ -207,22 +210,8 @@ def ask_pepper_question(question, response_actions, robot_ip="localhost", robot_
 
 # Ejemplo de uso
 if __name__ == "__main__":
-    # Ejemplo 1: Pregunta Sí/No con valores numéricos
-    question1 = "¿Tienes alguna otra pregunta?"
-    actions1 = {
-        "si": {"text": "¡Vamos!", "value": 1},
-        "no": {"text": "Entiendo. Ha sido un placer. No dudes en volver a consultarme.", "value": 0}
-    }
-    
-    print("=== Ejemplo 1: Pregunta Sí/No ===")
-    text, value = ask_pepper_question(question1, actions1)
-    print("Resultado: ('{}', {})".format(text, value))
-    
-    # Si quieres que el robot diga el texto, lo puedes hacer después:
-    if text:
-        handler = PepperInteractionHandler()
-        handler.tts.say(text)
-    
+
+    print("\n=== Ejemplo 2: Múltiples opciones ===")
     # Ejemplo 2: Pregunta de múltiples opciones con diferentes valores
     question2 = "¿Qué te gustaría hacer? Puedes decir: bailar, cantar o hablar."
     actions2 = {
@@ -244,3 +233,21 @@ if __name__ == "__main__":
         print("Activando modo conversación...")
     else:
         print("No se reconoció la respuesta")
+
+    print("\n=== Ejemplo 1: Múltiples opciones ===")
+    # Ejemplo 1: Pregunta Sí/No con valores numéricos
+    question1 = "¿Tienes alguna otra pregunta?"
+    actions1 = {
+        "si": {"text": "¡Vamos!", "value": 1},
+        "no": {"text": "Entiendo. Ha sido un placer. No dudes en volver a consultarme.", "value": 0}
+    }
+    
+    print("=== Ejemplo 1: Pregunta Sí/No ===")
+    text, value = ask_pepper_question(question1, actions1)
+    print("Resultado: ('{}', {})".format(text, value))
+    
+    # Si quieres que el robot diga el texto, lo puedes hacer después:
+    if text:
+        handler = PepperInteractionHandler()
+        handler.tts.say(text)
+    
