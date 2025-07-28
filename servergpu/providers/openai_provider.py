@@ -31,7 +31,7 @@ class OpenAIProvider(BaseProvider):
 
         messages = [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_inputs}
+            {"role": "user", "content": prompt}
         ]
 
         try:
