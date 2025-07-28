@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
 Script para que Pepper reaccione a respuestas personalizables
 Requiere Python 2.7 y NAOqi SDK
 """
 
+from __future__ import print_function
 from naoqi import ALProxy
 import time
 
@@ -111,6 +112,8 @@ class PepperInteractionHandler:
             # Pausar ASR para cambiar vocabulario
             self.asr.pause(True)
             
+            self.asr.setLanguage("English")
+            self.asr.setLanguage("Spanish")
             # Crear vocabulario expandido (incluir variaciones)
             vocabulary = []
             for response in possible_responses:

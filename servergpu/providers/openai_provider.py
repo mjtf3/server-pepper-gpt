@@ -5,7 +5,7 @@ import json
 from .base_provider import BaseProvider
 
 # Load the API key from the .env file
-load_dotenv()
+#load_dotenv()
 
 class OpenAIProvider(BaseProvider):
     def __init__(self):
@@ -38,7 +38,6 @@ class OpenAIProvider(BaseProvider):
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                response_format={"type": "json_object"},
                 temperature=self.temperature, # controls randomness
                 max_completion_tokens=self.max_tokens, # controls response length)
                 top_p=self.top_p, # controls diversity, adjusts probability distribution
