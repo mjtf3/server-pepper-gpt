@@ -35,7 +35,7 @@ class OpenAIProvider(BaseProvider):
         ]
 
         try:
-            response = self.client.chat.completions.create(
+            response = self.client.responses.create(
                 model=self.model,
                 messages=messages,
                 temperature=self.temperature, # controls randomness
@@ -46,7 +46,7 @@ class OpenAIProvider(BaseProvider):
             )
 
             chatgpt_response_json = response.choices[0].message.content.strip()
-            return json.loads(chatgpt_response_json)
+            return response
 
         except Exception as e:
             print(f"Ha ocurrido un error: {str(e)}")
