@@ -35,7 +35,7 @@ class OpenAIProvider(BaseProvider):
         ]
 
         try:
-            response = self.client.responses.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 temperature=self.temperature, # controls randomness
@@ -45,7 +45,6 @@ class OpenAIProvider(BaseProvider):
                 presence_penalty=0, # affect repetition                
             )
 
-            chatgpt_response_json = response.choices[0].message.content.strip()
             return response
 
         except Exception as e:
