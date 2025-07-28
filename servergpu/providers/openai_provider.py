@@ -45,7 +45,9 @@ class OpenAIProvider(BaseProvider):
                 presence_penalty=0, # affect repetition                
             )
 
-            return response
+            message = response.choices[0].message
+
+            return message.content
 
         except Exception as e:
             print(f"Ha ocurrido un error: {str(e)}")
