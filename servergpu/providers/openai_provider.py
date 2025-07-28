@@ -5,7 +5,7 @@ import json
 from .base_provider import BaseProvider
 
 # Load the API key from the .env file
-#load_dotenv()
+load_dotenv()
 
 class OpenAIProvider(BaseProvider):
     def __init__(self):
@@ -24,10 +24,6 @@ class OpenAIProvider(BaseProvider):
             return {
                 "test": "test response"
             }
-       
-        user_inputs = [
-            {"type": "text", "text": prompt},            
-        ]
 
         messages = [
             {"role": "system", "content": system_prompt},
